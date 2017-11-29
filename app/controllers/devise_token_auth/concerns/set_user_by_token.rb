@@ -24,7 +24,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
   # user auth
   def set_user_by_token(mapping=nil)
     # determine target authentication class
-    rc = resource_class(mapping)
+    rc = set_user_by_token_resource_class(mapping)
 
     # no default user defined
     return unless rc
@@ -140,9 +140,17 @@ module DeviseTokenAuth::Concerns::SetUserByToken
 
   end
 
+  def set_user_by_token_resource_class(mapping)(m=nil)
+    if m
+      mapping = Devise.mappings[m]
+    else
+      mapping = Devise.mappings[resource_name] || Devise.mappings.values.first
+    end
+
+    mapping.to
+  end
+
   private
-
-
   def is_batch_request?(user, client_id)
     !params[:unbatch] &&
     user.tokens[client_id] &&
